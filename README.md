@@ -1,2 +1,2 @@
-# vidraux
-draw on screen whatever you want, live ! 🦊
+# viDraux
+draw on videos whatever you want, live ! 🦊
