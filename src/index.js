@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Vidraux from "./Vidraux";
+import Vidraux from "./components/Vidraux";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(<Vidraux />, document.getElementById("root"));
