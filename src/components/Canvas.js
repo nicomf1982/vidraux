@@ -2,65 +2,111 @@ import React from "react";
 import { fabric } from "fabric";
 import store from "../store";
 
-class Canvas extends React.Component {
-  state = 0;
+const RECORDING = 1;
+const PLAYBACK = 2;
 
-  constructor(props) {
-    super(props);
-    this.frames = [];
-  }
+class Canvas extends React.Component {
   componentDidMount = () => {
-    this.canvas = new fabric.Canvas("drawing-canvas");
-    this.canvas.isDrawingMode = 1;
-    this.canvas.freeDrawingBrush.color = "purple";
-    this.canvas.freeDrawingBrush.width = 10;
-    this.canvas.renderAll();
-    store.dispatch({ type: "NEW_CANVAS", payload: this.canvas });
+    //create canvas and store it
+    let canvas = new fabric.Canvas("drawing-canvas");
+    canvas.isDrawingMode = 0;
+    canvas.freeDrawingBrush.color = "purple";
+    canvas.freeDrawingBrush.width = 10;
+    canvas.renderAll();
+    store.dispatch({ type: "NEW_CANVAS", payload: canvas });
+
+    //register timer (1s interval)
     setTimeout(this.onTick, 1000);
   };
 
   onTick = () => {
-    let player = store.getState().player;
-    if (player) {
-      if (store.getState().canvasState === 1) {
+    // re-register timer (1s interval)
+    setTimeout(this.onTick, 1000);
+    // check for player
+    if (!store.getState().player) {
+      return;
+    }
+    // record or playback canvas
+    switch (store.getState().recording) {
+      case RECORDING: {
         this.saveCanvasOnCurrentTime();
-      } else {
+        break;
+      }
+      case PLAYBACK: {
         this.loadCanvasOnCurrentTime();
+        break;
+      }
+      default: {
       }
     }
-    setTimeout(this.onTick, 1000);
   };
 
   saveCanvasOnCurrentTime = () => {
+    // build current frame
     let frame = {
       time: Math.floor(store.getState().player.getCurrentTime()),
-      data: this.canvas.toJSON()
+      data: store.getState().canvas.toJSON()
     };
+    // store current frame
     store.dispatch({ type: "NEW_FRAME", payload: frame });
   };
 
   loadCanvasOnCurrentTime = () => {
-    let frame = store
-      .getState()
-      .frames.filter(
-        f => f.time === Math.floor(store.getState().player.getCurrentTime())
-      )[0];
+    // get frame based on current time
+    let atThisTime = Math.floor(store.getState().player.getCurrentTime());
+    let frame = store.getState().frames[atThisTime];
+    let canvas = store.getState().canvas;
     if (frame) {
-      this.canvas.loadFromJSON(frame.data);
+      // load frame
+      canvas.loadFromJSON(frame);
+    } else {
+      canvas.clear();
     }
   };
 
-  change = () => {
-    store.dispatch({ type: "CHANGE_CANVAS_STATE" });
+  freehand = () => {
+    store.dispatch({ type: "DRAWING_STATE", payload: 1 });
+  };
+
+  selection = () => {
+    store.dispatch({ type: "DRAWING_STATE", payload: 0 });
+  };
+
+  nothing = () => {
+    store.dispatch({ type: "RECORDING_STATE", payload: 0 });
+  };
+
+  record = () => {
+    store.dispatch({ type: "RECORDING_STATE", payload: RECORDING });
+  };
+
+  play = () => {
+    store.dispatch({ type: "RECORDING_STATE", payload: PLAYBACK });
   };
 
   render = () => {
     return (
       <div className="drawing-canvas-container">
         <canvas id="drawing-canvas" height="300" width="640" />
-        <button type="button" onClick={this.change}>
-          CHANGE
-        </button>
+        <nav>
+          Dwaring:
+          <button type="button" onClick={this.freehand}>
+            START
+          </button>
+          <button type="button" onClick={this.selection}>
+            STOP
+          </button>
+          Play mode
+          <button type="button" onClick={this.record}>
+            RECORD
+          </button>
+          <button type="button" onClick={this.play}>
+            PLAYBACK
+          </button>
+          <button type="button" onClick={this.nothing}>
+            NOTHING
+          </button>
+        </nav>
       </div>
     );
   };

@@ -1,4 +1,4 @@
-const reducer = (state = { canvasState: 1, frames: [] }, action) => {
+const reducer = (state = { frames: {}, recording: 0 }, action) => {
   switch (action.type) {
     case "PLAYER_READY": {
       return { ...state, player: action.payload };
@@ -6,12 +6,16 @@ const reducer = (state = { canvasState: 1, frames: [] }, action) => {
     case "NEW_CANVAS": {
       return { ...state, canvas: action.payload };
     }
-    case "CHANGE_CANVAS_STATE": {
-      let newCanvasState = state.canvasState === 0 ? 1 : 0;
-      return { ...state, canvasState: newCanvasState };
+    case "DRAWING_STATE": {
+      state.canvas.isDrawingMode = action.payload;
+      return { ...state };
+    }
+    case "RECORDING_STATE": {
+      return { ...state, recording: action.payload };
     }
     case "NEW_FRAME": {
-      return { ...state, frames: [...state.frames, action.payload] };
+      state.frames[action.payload.time] = action.payload.data;
+      return { ...state };
     }
     default:
       return state;
