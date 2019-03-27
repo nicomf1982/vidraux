@@ -1,7 +1,7 @@
 import React from "react";
 import store from "../store";
 
-const playerDefaultConfig = {
+const DEFAULT_PLAYER_CONFIG = {
   height: "360",
   width: "640",
   videoId: "y104cTXY3qY",
@@ -30,8 +30,7 @@ class Video extends React.Component {
   createPlayer = () => {
     this.YouTubeIframeAPIReady = true;
     this.player = new window.YT.Player("video-player", {
-      ...playerDefaultConfig,
-      videoId: "-1xif50QMr4",
+      ...DEFAULT_PLAYER_CONFIG,
       events: {
         onReady: this.onPlayerReady,
         onStateChange: this.onPlayerStateChange,

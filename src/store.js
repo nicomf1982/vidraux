@@ -4,7 +4,7 @@ import reducer from "./reducers/reducer";
 const store = createStore(reducer);
 
 store.subscribe(() => {
-  console.log(store.getState());
+  console.log("Change State", store.getState());
 });
 
 export default store;

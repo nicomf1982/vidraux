@@ -18,7 +18,7 @@ iframe {
   z-index: 1;
 }
 
-.drawing-canvas-container button {
+.drawing-canvas-container nav {
   position: relative;
   bottom: -100px;
 }
